@@ -3,7 +3,7 @@ import { Bell, Search, Clock, Shield, User } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 const PAGE_TITLES = {
-  '/': { label: 'Overview', sub: 'Mission Control · Sector 7-Gamma' },
+  '/overview': { label: 'Overview', sub: 'Mission Control · Sector 7-Gamma' },
   '/timelines': { label: 'Timelines', sub: 'Thread Weaver Array' },
   '/memories': { label: 'Memories', sub: 'Fragment Archive' },
   '/paradoxes': { label: 'Paradoxes', sub: 'Anomaly Detection Log' },

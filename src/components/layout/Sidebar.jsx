@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard,
   GitBranch,
@@ -13,7 +13,7 @@ import { useState, useEffect } from 'react'
 
 const NAV_ITEMS = [
   {
-    to: '/',
+    to: '/overview',
     label: 'Overview',
     icon: LayoutDashboard,
     end: true,
@@ -81,24 +81,26 @@ export default function Sidebar({ collapsed, onToggle }) {
 
       {/* Logo / Brand */}
       <div className="flex items-center gap-3 px-4 pt-5 pb-4 border-b border-loom-border shrink-0">
-        {/* Loom sigil */}
-        <div className="relative shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
-          style={{ background: 'linear-gradient(135deg, rgba(232,185,106,0.2), rgba(232,185,106,0.05))', border: '1px solid rgba(232,185,106,0.25)' }}
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M8 1 L8 15 M1 8 L15 8 M3 3 L13 13 M13 3 L3 13" stroke="#E8B96A" strokeWidth="1.2" strokeLinecap="round" opacity="0.8" />
-            <circle cx="8" cy="8" r="2.5" fill="none" stroke="#E8B96A" strokeWidth="1.2" />
-          </svg>
-          {/* Pulsing ring */}
-          <div className={`absolute inset-0 rounded-lg border border-thread/30 transition-all duration-300 ${pulse ? 'scale-125 opacity-0' : 'scale-100 opacity-100'}`} />
-        </div>
-
-        {!collapsed && (
-          <div className="flex flex-col min-w-0">
-            <span className="display text-sm font-medium text-thread leading-none">Memory Loom</span>
-            <span className="tele text-[10px] text-white/30 mt-0.5 leading-none">v2.4.1 · SECURE</span>
+        <Link to="/" className="flex items-center gap-3 hover:opacity-85 transition-opacity">
+          {/* Loom sigil */}
+          <div className="relative shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{ background: 'linear-gradient(135deg, rgba(232,185,106,0.2), rgba(232,185,106,0.05))', border: '1px solid rgba(232,185,106,0.25)' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 1 L8 15 M1 8 L15 8 M3 3 L13 13 M13 3 L3 13" stroke="#E8B96A" strokeWidth="1.2" strokeLinecap="round" opacity="0.8" />
+              <circle cx="8" cy="8" r="2.5" fill="none" stroke="#E8B96A" strokeWidth="1.2" />
+            </svg>
+            {/* Pulsing ring */}
+            <div className={`absolute inset-0 rounded-lg border border-thread/30 transition-all duration-300 ${pulse ? 'scale-125 opacity-0' : 'scale-100 opacity-100'}`} />
           </div>
-        )}
+
+          {!collapsed && (
+            <div className="flex flex-col min-w-0">
+              <span className="display text-sm font-medium text-thread leading-none">Memory Loom</span>
+              <span className="tele text-[10px] text-white/30 mt-0.5 leading-none">v2.4.1 · SECURE</span>
+            </div>
+          )}
+        </Link>
 
         <button
           onClick={onToggle}
