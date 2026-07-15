@@ -59,7 +59,7 @@ export default function BootAnimation({ onComplete }) {
 
   return (
     <div
-      className="fixed inset-0 flex flex-col bg-void font-mono text-white overflow-hidden"
+      className="fixed inset-0 flex flex-col bg-void font-mono text-white overflow-hidden screen-glitch"
       style={{
         background: '#04020a',
         opacity: fadeOut ? 0 : 1,
@@ -94,7 +94,7 @@ export default function BootAnimation({ onComplete }) {
             </svg>
           </div>
           <div>
-            <p className="tele text-xs font-medium tracking-widest uppercase" style={{ color: '#D4923A' }}>
+            <p className="tele text-xs font-medium tracking-widest uppercase text-glitch-hover" style={{ color: '#D4923A' }}>
               Memory Loom OS
             </p>
             <p className="tele text-[10px] text-white/30 mt-0.5">

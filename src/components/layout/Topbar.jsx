@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom'
-import { Bell, Search, Shield, User } from 'lucide-react'
+import { Bell, Search, Shield, User, Menu } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { mission } from '../../data'
 import { useSimulator } from '../../context/SimulatorContext'
@@ -75,7 +75,7 @@ function LiveTime() {
   )
 }
 
-export default function Topbar() {
+export default function Topbar({ onMenuClick }) {
   const { pathname } = useLocation()
   const page = PAGE_TITLES[pathname] || { label: 'Memory Loom', sub: '' }
   const [searchFocused, setSearchFocused] = useState(false)
@@ -92,6 +92,15 @@ export default function Topbar() {
       }}
       className="flex items-center gap-4 px-5 shrink-0 relative z-10"
     >
+      {/* Mobile menu trigger */}
+      <button
+        onClick={onMenuClick}
+        className="md:hidden p-2 rounded-lg transition-colors shrink-0 mr-0.5"
+        style={{ color: 'rgba(212,146,58,0.7)', border: '1px solid rgba(212,146,58,0.15)', background: 'rgba(212,146,58,0.05)' }}
+        aria-label="Open navigation menu"
+      >
+        <Menu size={14} />
+      </button>
       {/* ── Page context ── */}
       <div className="flex flex-col min-w-0 flex-1">
         <div className="flex items-center gap-2">

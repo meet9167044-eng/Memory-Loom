@@ -536,3 +536,55 @@ body {
 .page-enter {
   animation: page-in 0.4s ease-out both;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN (Step 10)
+═══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Sidebar overlay styling for mobile */
+  .sidebar-mobile {
+    position: fixed !important;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    height: 100vh !important;
+    z-index: 50 !important;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.95), 0 0 100px rgba(0,0,0,0.8);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .sidebar-mobile-closed {
+    transform: translateX(-100%) !important;
+  }
+
+  .sidebar-mobile-open {
+    transform: translateX(0) !important;
+  }
+}
+
+/* ─── Glitch Boot Animations (Step 9) ─── */
+@keyframes screen-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.96; }
+  90% { opacity: 0.98; }
+  93% { opacity: 0.4; }
+  94% { opacity: 0.97; }
+  98% { opacity: 0.99; }
+}
+
+@keyframes text-glitch {
+  0%, 100% { transform: translate(0); text-shadow: none; }
+  94% { transform: translate(0); text-shadow: none; }
+  95% { transform: translate(1px, -0.5px); text-shadow: -1px 0 #C44B6E, 1px 0 #4A8FA8; }
+  96% { transform: translate(-1px, 0.5px); text-shadow: 1px -1px #D4923A, -1px 1px #7B5EA8; }
+  97% { transform: translate(0); text-shadow: none; }
+}
+
+.screen-glitch {
+  animation: screen-flicker 6s infinite;
+}
+
+.text-glitch-hover:hover {
+  animation: text-glitch 0.45s infinite;
+}
+

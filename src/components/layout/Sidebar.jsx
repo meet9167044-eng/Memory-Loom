@@ -16,7 +16,7 @@ const NAV_ITEMS = [
   { to: '/settings',     label: 'Settings',     icon: Settings,   desc: 'Archivist Prefs' },
 ]
 
-export default function Sidebar({ collapsed, onToggle }) {
+export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }) {
   const { state: sim } = useSimulator()
   const INTEGRITY = sim.integrity
   const [pulse, setPulse] = useState(false)
@@ -44,7 +44,7 @@ export default function Sidebar({ collapsed, onToggle }) {
         width: collapsed ? '64px' : 'var(--sidebar-w)',
         minWidth: collapsed ? '64px' : 'var(--sidebar-w)',
       }}
-      className="sidebar-surface relative flex flex-col h-screen transition-all duration-300 ease-in-out overflow-hidden z-20"
+      className={`sidebar-surface relative flex flex-col h-screen transition-all duration-300 ease-in-out overflow-hidden z-20 sidebar-mobile ${mobileOpen ? 'sidebar-mobile-open' : 'sidebar-mobile-closed'}`}
     >
       {/* Top ambient glow */}
       <div
@@ -104,7 +104,7 @@ export default function Sidebar({ collapsed, onToggle }) {
 
         <button
           onClick={onToggle}
-          className="ml-auto p-1 rounded-md transition-colors shrink-0"
+          className="ml-auto p-1 rounded-md transition-colors shrink-0 hidden md:block"
           style={{ color: 'rgba(212,146,58,0.35)' }}
           aria-label="Toggle sidebar"
         >
@@ -160,6 +160,7 @@ export default function Sidebar({ collapsed, onToggle }) {
                 <NavLink
                   to={to}
                   end={end}
+                  onClick={onMobileClose}
                   title={collapsed ? label : undefined}
                   className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-150 relative"
                 style={({ isActive }) => ({
