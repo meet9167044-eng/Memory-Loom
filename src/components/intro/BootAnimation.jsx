@@ -61,6 +61,7 @@ export default function BootAnimation({ onComplete }) {
     <div
       className="fixed inset-0 flex flex-col bg-void font-mono text-white overflow-hidden"
       style={{
+        background: '#04020a',
         opacity: fadeOut ? 0 : 1,
         transition: 'opacity 0.4s ease',
       }}
@@ -70,30 +71,30 @@ export default function BootAnimation({ onComplete }) {
         className="pointer-events-none absolute inset-0 z-10"
         style={{
           background:
-            'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px)',
+            'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px)',
         }}
       />
 
       {/* Ambient glow */}
       <div
         className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 rounded-full blur-3xl"
-        style={{ background: 'radial-gradient(ellipse, rgba(232,185,106,0.07) 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(ellipse, rgba(212,146,58,0.08) 0%, transparent 70%)' }}
       />
 
       <div className="relative z-20 flex flex-col h-full px-8 md:px-16 py-12">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8 pb-4 border-b border-thread/20">
+        <div className="flex items-center gap-4 mb-8 pb-4 border-b" style={{ borderBottomColor: 'rgba(212,146,58,0.12)' }}>
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: 'rgba(232,185,106,0.1)', border: '1px solid rgba(232,185,106,0.3)' }}
+            style={{ background: 'rgba(212,146,58,0.1)', border: '1px solid rgba(212,146,58,0.3)' }}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 1L8 15M1 8L15 8M3 3L13 13M13 3L3 13" stroke="#E8B96A" strokeWidth="1.2" strokeLinecap="round" opacity="0.8"/>
-              <circle cx="8" cy="8" r="2.5" fill="none" stroke="#E8B96A" strokeWidth="1.2"/>
+              <path d="M8 1L8 15M1 8L15 8M3 3L13 13M13 3L3 13" stroke="#D4923A" strokeWidth="1.2" strokeLinecap="round" opacity="0.8"/>
+              <circle cx="8" cy="8" r="2.5" fill="none" stroke="#D4923A" strokeWidth="1.2"/>
             </svg>
           </div>
           <div>
-            <p className="tele text-xs text-thread font-medium tracking-widest uppercase">
+            <p className="tele text-xs font-medium tracking-widest uppercase" style={{ color: '#D4923A' }}>
               Memory Loom OS
             </p>
             <p className="tele text-[10px] text-white/30 mt-0.5">
@@ -101,8 +102,8 @@ export default function BootAnimation({ onComplete }) {
             </p>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-thread animate-pulse" />
-            <span className="tele text-[10px] text-thread/50">BOOTING</span>
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#D4923A' }} />
+            <span className="tele text-[10px]" style={{ color: 'rgba(212,146,58,0.5)' }}>BOOTING</span>
           </div>
         </div>
 
@@ -117,17 +118,17 @@ export default function BootAnimation({ onComplete }) {
                   animation: 'fadeSlideIn 0.2s ease forwards',
                 }}
               >
-                <span className="tele text-[10px] text-thread/40 shrink-0 mt-0.5">
+                <span className="tele text-[10px] shrink-0 mt-0.5" style={{ color: 'rgba(212,146,58,0.3)' }}>
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <span
                   className="tele text-[11px] leading-relaxed"
                   style={{
                     color: line.includes('WARNING') || line.includes('⚠')
-                      ? '#E8506A'
+                      ? '#C44B6E'
                       : line.includes('READY') || line.includes('DONE') || line.includes('OK') || line.includes('ESTABLISHED')
-                        ? '#4C8CFF'
-                        : 'rgba(255,255,255,0.65)',
+                        ? '#4A8FA8'
+                        : 'rgba(255,240,210,0.65)',
                   }}
                 >
                   {line}
@@ -137,10 +138,10 @@ export default function BootAnimation({ onComplete }) {
             {/* Blinking cursor */}
             {visibleLines.length < BOOT_LINES.length && (
               <div className="flex items-center gap-3">
-                <span className="tele text-[10px] text-thread/40">
+                <span className="tele text-[10px]" style={{ color: 'rgba(212,146,58,0.3)' }}>
                   {String(visibleLines.length + 1).padStart(2, '0')}
                 </span>
-                <span className="tele text-[11px] text-white/40 animate-pulse">█</span>
+                <span className="tele text-[11px] animate-pulse" style={{ color: 'rgba(212,146,58,0.4)' }}>█</span>
               </div>
             )}
           </div>
@@ -150,15 +151,15 @@ export default function BootAnimation({ onComplete }) {
         <div className="mt-8 space-y-2">
           <div className="flex items-center justify-between">
             <span className="tele text-[10px] text-white/30">Loading Loom Modules</span>
-            <span className="tele text-[10px] text-thread">{Math.round(progress)}%</span>
+            <span className="tele text-[10px]" style={{ color: '#D4923A' }}>{Math.round(progress)}%</span>
           </div>
           <div className="h-1 bg-white/5 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-none"
               style={{
                 width: `${progress}%`,
-                background: 'linear-gradient(90deg, #9D6FE0, #4C8CFF, #E8B96A)',
-                boxShadow: '0 0 8px rgba(232,185,106,0.3)',
+                background: 'linear-gradient(90deg, #7B5EA8, #4A8FA8, #D4923A)',
+                boxShadow: '0 0 12px rgba(212,146,58,0.5)',
               }}
             />
           </div>

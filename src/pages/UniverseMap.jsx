@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Globe, Layers, Activity, Info } from 'lucide-react'
 import { sectors, edges, sectorsMeta } from '../data'
+import EmberBar from '../components/ui/EmberBar'
 
 function getNode(id) { return sectors.find((s) => s.id === id) }
 
@@ -97,10 +98,10 @@ export default function UniverseMap() {
                   {n.activeParadoxes > 0 && (
                     <span className="badge-decay tele text-[8px] px-1 py-0.5 rounded">{n.activeParadoxes}P</span>
                   )}
-                  <div className="w-16 h-1 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full" style={{ width: `${n.integrity}%`, background: n.color }} />
+                  <div className="w-16">
+                    <EmberBar value={n.integrity} height={2} colorFn={() => n.color} />
                   </div>
-                  <span className="tele text-[10px] w-8 text-right" style={{ color: n.color }}>{n.integrity}%</span>
+                  <span className="tele text-[10px] w-8 text-right shrink-0" style={{ color: n.color }}>{n.integrity}%</span>
                 </button>
               ))}
             </div>

@@ -9,15 +9,16 @@ import Paradoxes from '../../pages/Paradoxes'
 import UniverseMap from '../../pages/UniverseMap'
 import Settings from '../../pages/Settings'
 
-// DashboardShell owns the Sidebar + Topbar frame.
-// BrowserRouter lives in main.jsx so URLs change correctly.
 export default function DashboardShell() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   return (
-    <div className="flex h-screen overflow-hidden bg-void">
-      {/* Ambient thread glow (fixed, behind everything) */}
+    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--clr-bg)' }}>
+
+      {/* ── Scene background layers ── */}
+      <div className="scene-bg" />
       <div className="thread-ambient pointer-events-none" />
+      <div className="thread-ambient-2 pointer-events-none" />
 
       {/* Sidebar */}
       <Sidebar
@@ -26,10 +27,10 @@ export default function DashboardShell() {
       />
 
       {/* Right column: Topbar + page content */}
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative z-10">
         <Topbar />
 
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto page-enter">
           <Routes>
             <Route path="/overview"     element={<Overview />} />
             <Route path="/timelines"    element={<Timelines />} />

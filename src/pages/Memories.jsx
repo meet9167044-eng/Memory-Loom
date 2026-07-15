@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Brain, Search, Filter, Star, X } from 'lucide-react'
 import { fragments, fragmentsMeta } from '../data'
+import EmberBar from '../components/ui/EmberBar'
 
 const TYPES = ['All', 'Event', 'Personal', 'Military', 'Technical', 'Medical', 'Political', 'Astronomical', 'Oral History', 'Legal', 'Economic', 'Cultural', 'Geographical', 'Ceremonial', 'Scientific', 'Media', 'Anomaly']
 
@@ -129,8 +130,8 @@ export default function Memories() {
                 </div>
                 <p className="text-sm text-white/75 font-medium leading-snug mb-3">{f.title}</p>
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full" style={{ width: `${f.integrity}%`, background: intColor }} />
+                  <div className="flex-1">
+                    <EmberBar value={f.integrity} height={3} />
                   </div>
                   <span className="tele text-[10px]" style={{ color: intColor }}>{f.integrity}%</span>
                 </div>

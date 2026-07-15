@@ -1,21 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
-import {
-  AlertTriangle,
-  TrendingDown,
-  Zap,
-  Clock,
-  GitBranch,
-  Brain,
-  Activity,
-  Radio,
-  Heart,
-  MessageSquare,
-  ChevronRight,
-} from 'lucide-react'
+import { AlertTriangle, Zap, Clock, GitBranch, Brain, Activity, Radio, Heart, MessageSquare, ChevronRight } from 'lucide-react'
 import { dashStats, events, mission } from '../data'
+import LoomCanvas from '../components/loom-canvas/LoomCanvas'
+import EmberBar from '../components/ui/EmberBar'
+import { useSimulator } from '../context/SimulatorContext'
 
-/* ── Animated counter ──────────────────────────────── */
-function AnimatedCounter({ to, suffix = '', decimals = 1, duration = 1800 }) {
+/* ══════════════════════════════════════════════════
+   ANIMATED COUNTER
+══════════════════════════════════════════════════ */
+function AnimatedCounter({ to, suffix = '', decimals = 1, duration = 2000 }) {
   const [val, setVal] = useState(0)
   const start = useRef(null)
   useEffect(() => {
@@ -32,167 +25,145 @@ function AnimatedCounter({ to, suffix = '', decimals = 1, duration = 1800 }) {
   return <>{val.toFixed(decimals)}{suffix}</>
 }
 
-/* ── Reality Integrity ring ────────────────────────── */
+/* ══════════════════════════════════════════════════
+   BREATHING INTEGRITY RING
+══════════════════════════════════════════════════ */
 function IntegrityRing({ value }) {
-  const r = 48
+  const r = 46
   const circ = 2 * Math.PI * r
   const [dash, setDash] = useState(0)
+  const [tremor, setTremor] = useState(0)
+
   useEffect(() => {
-    const t = setTimeout(() => setDash((value / 100) * circ), 200)
+    const t = setTimeout(() => setDash((value / 100) * circ), 250)
     return () => clearTimeout(t)
   }, [value, circ])
-  const color = value < 40 ? '#E8506A' : value < 65 ? '#E8B96A' : '#4C8CFF'
+
+  // Tremor on critical
+  useEffect(() => {
+    if (value >= 50) return
+    const interval = setInterval(() => {
+      setTremor((Math.random() - 0.5) * 1.5)
+      setTimeout(() => setTremor(0), 180)
+    }, 2800)
+    return () => clearInterval(interval)
+  }, [value])
+
+  const color = value < 35 ? '#C44B6E' : value < 60 ? '#D4923A' : '#4A8FA8'
+
   return (
     <div className="relative flex items-center justify-center w-28 h-28">
-      <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 112 112">
-        <circle cx="56" cy="56" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="5" />
+      <svg
+        className="absolute inset-0 w-full h-full -rotate-90 integrity-ring-svg"
+        viewBox="0 0 112 112"
+        style={{
+          '--ring-color': color,
+          transform: `rotate(-90deg) translate(${tremor}px, ${tremor * 0.5}px)`,
+          transition: 'transform 0.15s ease-out',
+        }}
+      >
+        {/* Track */}
+        <circle cx="56" cy="56" r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="5" />
+        {/* Glow track */}
         <circle
           cx="56" cy="56" r={r}
-          fill="none" stroke={color} strokeWidth="5" strokeLinecap="round"
-          strokeDasharray={circ} strokeDashoffset={circ - dash}
-          style={{ transition: 'stroke-dashoffset 1.8s cubic-bezier(0.4,0,0.2,1)', filter: `drop-shadow(0 0 5px ${color}80)` }}
+          fill="none"
+          stroke={color}
+          strokeWidth="1"
+          opacity="0.12"
+        />
+        {/* Fill arc */}
+        <circle
+          cx="56" cy="56" r={r}
+          fill="none"
+          stroke={color}
+          strokeWidth="5"
+          strokeLinecap="round"
+          strokeDasharray={circ}
+          strokeDashoffset={circ - dash}
+          style={{
+            transition: 'stroke-dashoffset 2s cubic-bezier(0.4,0,0.2,1)',
+            filter: `drop-shadow(0 0 6px ${color}88)`,
+          }}
         />
       </svg>
+
+      {/* Centre reading */}
       <div className="flex flex-col items-center z-10">
-        <span className="display text-xl font-normal" style={{ color, letterSpacing: '-0.04em' }}>
+        <span
+          className="display text-xl font-normal"
+          style={{ color, letterSpacing: '-0.04em', textShadow: `0 0 20px ${color}60` }}
+        >
           <AnimatedCounter to={value} suffix="%" />
         </span>
-        <span className="tele text-[8px] text-white/30 uppercase tracking-widest">INT</span>
-      </div>
-    </div>
-  )
-}
-
-/* ── 3D Loom Canvas placeholder ────────────────────── */
-// This will be replaced with a real Three.js / R3F scene in Step 6.
-function LoomCanvasPlaceholder() {
-  const [angle, setAngle] = useState(0)
-  useEffect(() => {
-    const id = setInterval(() => setAngle((a) => (a + 0.4) % 360), 30)
-    return () => clearInterval(id)
-  }, [])
-
-  const threads = [0, 60, 120, 180, 240, 300]
-
-  return (
-    <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-      {/* Grid background */}
-      <div
-        className="absolute inset-0 opacity-20"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(232,185,106,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(232,185,106,0.15) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-        }}
-      />
-      {/* Perspective SVG */}
-      <svg
-        className="relative z-10"
-        viewBox="-120 -120 240 240"
-        style={{ width: 'min(280px, 80%)', height: 'min(280px, 80%)' }}
-      >
-        {/* Thread strands */}
-        {threads.map((base, i) => {
-          const a = ((base + angle) * Math.PI) / 180
-          const x1 = Math.cos(a) * 100
-          const y1 = Math.sin(a) * 30
-          const x2 = Math.cos(a + Math.PI) * 100
-          const y2 = Math.sin(a + Math.PI) * 30
-          const colors = ['#E8B96A', '#4C8CFF', '#9D6FE0', '#E8506A', '#E8B96A', '#4C8CFF']
-          return (
-            <line
-              key={i}
-              x1={x1} y1={y1} x2={x2} y2={y2}
-              stroke={colors[i]} strokeWidth="0.6" opacity="0.4"
-              style={{ filter: `drop-shadow(0 0 3px ${colors[i]}60)` }}
-            />
-          )
-        })}
-        {/* Orbit ring */}
-        <ellipse cx="0" cy="0" rx="100" ry="32" fill="none" stroke="rgba(232,185,106,0.15)" strokeWidth="0.8" />
-        {/* Core */}
-        <circle cx="0" cy="0" r="22" fill="none" stroke="rgba(232,185,106,0.4)" strokeWidth="0.8" />
-        <circle cx="0" cy="0" r="14" fill="rgba(232,185,106,0.08)" />
-        <circle cx="0" cy="0" r="6"
-          fill="rgba(232,185,106,0.9)"
-          style={{ filter: 'drop-shadow(0 0 8px rgba(232,185,106,0.8))' }}
-        />
-        {/* Fragment nodes */}
-        {[0, 72, 144, 216, 288].map((deg, i) => {
-          const rad = (deg + angle * 0.5) * Math.PI / 180
-          const cx = Math.cos(rad) * 70
-          const cy = Math.sin(rad) * 22
-          const nodeColors = ['#E8B96A', '#4C8CFF', '#E8506A', '#9D6FE0', '#4C8CFF']
-          return (
-            <circle key={i} cx={cx} cy={cy} r="3.5"
-              fill={nodeColors[i]} opacity="0.7"
-              style={{ filter: `drop-shadow(0 0 4px ${nodeColors[i]}80)` }}
-            />
-          )
-        })}
-      </svg>
-      {/* Label */}
-      <div className="absolute bottom-3 left-0 right-0 text-center">
-        <span className="tele text-[9px] text-white/20 uppercase tracking-widest">
-          3D Loom Canvas — Three.js coming in Step 6
+        <span className="tele text-[8px] mt-0.5 uppercase tracking-widest" style={{ color: 'rgba(255,200,120,0.35)' }}>
+          INT
         </span>
       </div>
     </div>
   )
 }
 
-/* ── Alert item ────────────────────────────────────── */
-function AlertItem({ type, message, time }) {
-  const cfg = {
-    critical: { color: 'text-decay', bg: 'bg-decay/8 border-decay/20', icon: AlertTriangle },
-    warn:     { color: 'text-thread', bg: 'bg-thread/8 border-thread/20', icon: Zap },
-    info:     { color: 'text-stability', bg: 'bg-stability/8 border-stability/20', icon: Radio },
-  }[type] || {}
-  const Icon = cfg.icon
-  return (
-    <div className={`flex items-start gap-2.5 p-2.5 rounded-lg border ${cfg.bg} mb-2 last:mb-0`}>
-      <Icon size={12} className={`${cfg.color} shrink-0 mt-0.5`} />
-      <div className="flex-1 min-w-0">
-        <p className="text-xs text-white/70 leading-snug">{message}</p>
-        <span className="tele text-[9px] text-white/25 mt-0.5 block">{time}</span>
-      </div>
-    </div>
-  )
-}
-
-/* ── Emotion readout ───────────────────────────────── */
+/* ══════════════════════════════════════════════════
+   EMOTION BAR
+══════════════════════════════════════════════════ */
 function EmotionBar({ label, value, color }) {
-  const [w, setW] = useState(0)
-  useEffect(() => { const t = setTimeout(() => setW(value), 400); return () => clearTimeout(t) }, [value])
+  const [width, setWidth] = useState(0)
+  useEffect(() => {
+    const t = setTimeout(() => setWidth(value), 300)
+    return () => clearTimeout(t)
+  }, [value])
+
   return (
-    <div className="flex items-center gap-3 py-1">
-      <span className="tele text-[9px] text-white/35 w-16 shrink-0">{label}</span>
-      <div className="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
-        <div className="h-full rounded-full transition-all duration-1200"
-          style={{ width: `${w}%`, background: color, boxShadow: `0 0 5px ${color}50` }} />
+    <div className="flex items-center gap-3 mb-2.5">
+      <span className="display text-[11px] w-14 shrink-0 font-normal" style={{ color: 'rgba(255,220,160,0.5)' }}>
+        {label}
+      </span>
+      <div className="flex-1 relative h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }}>
+        <div
+          className="absolute inset-y-0 left-0 rounded-full"
+          style={{
+            width: `${width}%`,
+            background: color,
+            boxShadow: `0 0 6px ${color}55`,
+            transition: 'width 1.6s cubic-bezier(0.4,0,0.2,1)',
+          }}
+        />
       </div>
-      <span className="tele text-[9px] w-6 text-right" style={{ color }}>{value}%</span>
+      <span className="tele text-[9px] w-7 text-right shrink-0" style={{ color }}>
+        {value}
+      </span>
     </div>
   )
 }
 
-/* ── Timeline event row ────────────────────────────── */
-function TimelineRow({ time, event, type, sector }) {
+/* ══════════════════════════════════════════════════
+   ALERT ITEM — Fade + blur in
+══════════════════════════════════════════════════ */
+function AlertItem({ type, message, time, index = 0 }) {
   const cfg = {
-    breach:   { dot: 'bg-decay',     badge: 'badge-decay',     label: 'Breach' },
-    restored: { dot: 'bg-stability', badge: 'badge-stability', label: 'Restored' },
-    anomaly:  { dot: 'bg-paradox',   badge: 'badge-paradox',   label: 'Anomaly' },
-    warn:     { dot: 'bg-thread',    badge: 'badge-thread',    label: 'Warning' },
-  }[type] || {}
+    critical: { dot: '#C44B6E', badge: 'badge-decay',    label: 'Critical' },
+    warn:     { dot: '#D4923A', badge: 'badge-warn',     label: 'Warning' },
+    info:     { dot: '#4A8FA8', badge: 'badge-stability', label: 'Restored' },
+    anomaly:  { dot: '#7B5EA8', badge: 'badge-paradox',  label: 'Anomaly' },
+  }[type] || { dot: '#D4923A', badge: 'badge-thread', label: 'Notice' }
+
   return (
-    <div className="flex items-start gap-3 py-2 border-b border-white/4 last:border-0">
-      <div className={`w-1.5 h-1.5 rounded-full ${cfg.dot} mt-1.5 shrink-0`} />
+    <div
+      className="alert-entry flex items-start gap-2.5 py-2.5"
+      style={{
+        borderBottom: '1px solid rgba(212,146,58,0.05)',
+        animationDelay: `${index * 80}ms`,
+      }}
+    >
+      <div
+        className="w-1.5 h-1.5 rounded-full shrink-0 mt-1.5"
+        style={{ background: cfg.dot, boxShadow: `0 0 6px ${cfg.dot}80` }}
+      />
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-white/65 leading-snug">{event}</p>
+        <p className="text-xs leading-snug" style={{ color: 'rgba(255,230,180,0.7)' }}>{message}</p>
         <div className="flex items-center gap-2 mt-0.5">
-          <span className="tele text-[9px] text-white/25">{time}</span>
-          <span className="tele text-[9px] text-white/20">·</span>
-          <span className="tele text-[9px] text-white/25">{sector}</span>
+          <span className="tele text-[9px]" style={{ color: 'rgba(212,146,58,0.3)' }}>{time}</span>
           <span className={`${cfg.badge} tele text-[8px] px-1 py-0.5 rounded ml-auto`}>{cfg.label}</span>
         </div>
       </div>
@@ -200,205 +171,350 @@ function TimelineRow({ time, event, type, sector }) {
   )
 }
 
-/* ═══════════════════════════════════════════════════ */
-/*  DATA INTEGRATION (DYNAMIC)                        */
-/* ═══════════════════════════════════════════════════ */
-const INTEGRITY = dashStats.integrityNow
+/* ══════════════════════════════════════════════════
+   TIMELINE ROW — Blur-in entry
+══════════════════════════════════════════════════ */
+function TimelineRow({ time, event: ev, type, sector, index = 0 }) {
+  const cfg = {
+    breach:   { dot: '#C44B6E', badge: 'badge-decay',    label: 'Breach' },
+    restored: { dot: '#4A8FA8', badge: 'badge-stability', label: 'Restored' },
+    anomaly:  { dot: '#7B5EA8', badge: 'badge-paradox',  label: 'Anomaly' },
+    warn:     { dot: '#D4923A', badge: 'badge-warn',     label: 'Warning' },
+  }[type] || {}
 
-const ALERTS = events
-  .filter(e => e.severity === 'critical' || e.severity === 'high' || e.severity === 'warn')
-  .map(e => ({
-    type: e.severity === 'critical' ? 'critical' : e.severity === 'warn' ? 'warn' : 'info',
-    message: e.event,
-    time: e.time
-  }))
+  return (
+    <div
+      className="alert-entry flex items-start gap-3 py-2 border-b"
+      style={{
+        borderBottomColor: 'rgba(212,146,58,0.04)',
+        animationDelay: `${index * 60}ms`,
+      }}
+    >
+      <div className="w-1.5 h-1.5 rounded-full shrink-0 mt-1.5" style={{ background: cfg.dot, boxShadow: `0 0 5px ${cfg.dot}70` }} />
+      <div className="flex-1 min-w-0">
+        <p className="text-xs leading-snug" style={{ color: 'rgba(255,230,180,0.65)' }}>{ev}</p>
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="tele text-[9px]" style={{ color: 'rgba(212,146,58,0.28)' }}>{time}</span>
+          <span className="tele text-[9px]" style={{ color: 'rgba(212,146,58,0.2)' }}>·</span>
+          <span className="tele text-[9px]" style={{ color: 'rgba(212,146,58,0.28)' }}>{sector}</span>
+          <span className={`${cfg.badge} tele text-[8px] px-1 py-0.5 rounded ml-auto`}>{cfg.label}</span>
+        </div>
+      </div>
+    </div>
+  )
+}
 
-const EMOTIONS = [
-  { label: 'Despair',  value: mission.emotionIndex.despair, color: '#E8506A' },
-  { label: 'Hope',     value: mission.emotionIndex.hope, color: '#4C8CFF' },
-  { label: 'Clarity',  value: mission.emotionIndex.clarity, color: '#9D6FE0' },
-  { label: 'Fear',     value: mission.emotionIndex.fear, color: '#E8B96A' },
-  { label: 'Resolve',  value: mission.emotionIndex.resolve, color: '#4C8CFF' },
-]
-
-const TIMELINE_EVENTS = events.slice(0, 5).map(e => ({
-  time: e.time,
-  event: e.event,
-  type: e.type,
-  sector: e.sector
-}))
-
-/* ═══════════════════════════════════════════════════ */
-/*  OVERVIEW PAGE                                     */
-/* ═══════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════
+   OVERVIEW PAGE
+══════════════════════════════════════════════════ */
 export default function Overview() {
+  const { state: sim } = useSimulator()
   const completedObjectives = mission.objectives.filter(o => o.done).length
   const totalObjectives = mission.objectives.length
 
+  const INTEGRITY = sim.integrity
+
+  const ALERTS = sim.events
+    .filter(e => e.severity === 'critical' || e.severity === 'high' || e.severity === 'warn')
+    .slice(0, 6)
+    .map(e => ({
+      type: e.severity === 'critical' ? 'critical' : e.type,
+      message: e.message || e.event,
+      time: e.time,
+    }))
+
+  const EMOTIONS = [
+    { label: 'Despair',  value: mission.emotionIndex.despair,  color: '#C44B6E' },
+    { label: 'Hope',     value: mission.emotionIndex.hope,     color: '#4A8FA8' },
+    { label: 'Clarity',  value: mission.emotionIndex.clarity,  color: '#7B5EA8' },
+    { label: 'Fear',     value: mission.emotionIndex.fear,     color: '#D4923A' },
+    { label: 'Resolve',  value: mission.emotionIndex.resolve,  color: '#B8A060' },
+  ]
+
+  const TIMELINE_EVENTS = sim.events.slice(0, 8).map(e => ({
+    time: e.time,
+    event: e.message || e.event,
+    type: e.type,
+    sector: e.sector,
+  }))
+
+  /* Stat cards */
+  const statCards = [
+    {
+      icon: Brain,
+      label: 'Fragments',
+      value: sim.fragmentsTotal.toLocaleString(),
+      sub: `↓ ${sim.fragmentsLost} since sync`,
+      color: '#C44B6E',
+    },
+    {
+      icon: GitBranch,
+      label: 'Timelines',
+      value: sim.timelinesActive.toLocaleString(),
+      sub: `${sim.timelinesDivergent} divergent`,
+      color: '#D4923A',
+    },
+    {
+      icon: Zap,
+      label: 'Paradoxes',
+      value: sim.paradoxesActive.toLocaleString(),
+      sub: `${sim.paradoxesCritical} critical`,
+      color: '#7B5EA8',
+    },
+    {
+      icon: Clock,
+      label: 'Time Left',
+      value: `${sim.hoursRemaining}h ${sim.minutesRemaining}m`,
+      sub: 'Until city erasure',
+      color: '#C44B6E',
+    },
+  ]
+
   return (
     <div className="p-4 h-full">
-      {/* ── Top quick-stats bar ── */}
+
+      {/* ── Quick-stat bar ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        {[
-          { icon: Brain,    label: 'Fragments',  value: dashStats.fragmentsTotal.toLocaleString(), sub: `↓ ${dashStats.fragmentsLost} since sync`, color: 'text-decay' },
-          { icon: GitBranch,label: 'Timelines',  value: dashStats.timelinesActive.toLocaleString(), sub: `${dashStats.timelinesDivergent} divergent`, color: 'text-stability' },
-          { icon: Zap,      label: 'Paradoxes',  value: dashStats.paradoxesActive.toLocaleString(), sub: `${dashStats.paradoxesCritical} critical`, color: 'text-paradox' },
-          { icon: Clock,    label: 'Time Left',  value: `${dashStats.hoursRemaining}h ${dashStats.minutesRemaining}m`, sub: 'Until city erasure', color: 'text-decay' },
-        ].map(({ icon: Icon, label, value, sub, color }) => (
-          <div key={label} className="loom-card px-3 py-2.5 flex items-center gap-3">
-            <Icon size={14} className={color} />
+        {statCards.map(({ icon: Icon, label, value, sub, color }) => (
+          <div
+            key={label}
+            className="loom-card px-3 py-2.5 flex items-center gap-3 group"
+          >
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+              style={{ background: `${color}15`, border: `1px solid ${color}25` }}
+            >
+              <Icon size={13} style={{ color }} />
+            </div>
             <div>
-              <div className={`display text-base font-normal ${color}`} style={{ letterSpacing: '-0.03em' }}>{value}</div>
-              <div className="tele text-[9px] text-white/30">{label} · {sub}</div>
+              <div
+                className="display text-base font-normal"
+                style={{ color, letterSpacing: '-0.03em', textShadow: `0 0 12px ${color}40` }}
+              >
+                {value}
+              </div>
+              <div className="tele text-[9px]" style={{ color: 'rgba(212,146,58,0.32)' }}>
+                {label} · {sub}
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* ── Main layout grid ── */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 h-[calc(100%-80px)]">
+      {/* ── Main 3-column grid ── */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4" style={{ minHeight: 'calc(100vh - 200px)' }}>
 
-        {/* ── LEFT COLUMN (Reality Integrity + Alerts + Emotion) ── */}
+        {/* ─── LEFT — Integrity + Alerts + Emotion ─── */}
         <div className="xl:col-span-3 flex flex-col gap-4">
 
           {/* Reality Integrity */}
           <div className="loom-card p-4">
             <div className="flex items-center justify-between mb-3">
-              <span className="display text-xs font-medium text-white/60 uppercase tracking-wide">Reality Integrity</span>
+              <span
+                className="display text-xs font-normal uppercase tracking-wide"
+                style={{ color: 'rgba(255,220,160,0.55)', letterSpacing: '0.12em' }}
+              >
+                Reality Integrity
+              </span>
               <div className="flex items-center gap-1.5">
-                <Radio size={10} className="text-decay animate-pulse" />
-                <span className="tele text-[9px] text-decay uppercase">Critical</span>
+                <Radio size={9} style={{ color: '#C44B6E' }} className="animate-pulse" />
+                <span className="tele text-[8px] uppercase" style={{ color: '#C44B6E' }}>Critical</span>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
               <IntegrityRing value={INTEGRITY} />
-              <div className="flex flex-col gap-2 flex-1">
+              <div className="flex flex-col gap-2.5 flex-1">
                 {[
-                  { label: 'Target', val: `${dashStats.integrityTarget}%`, color: 'text-stability' },
-                  { label: 'Gap',    val: `−${(dashStats.integrityTarget - INTEGRITY).toFixed(1)}%`, color: 'text-decay' },
-                  { label: 'Rate',   val: `${dashStats.integrityDecay > 0 ? '+' : ''}${dashStats.integrityDecay}%/h`, color: 'text-thread' },
+                  { label: 'Target', val: `${sim.integrityTarget}%`,  color: '#4A8FA8' },
+                  { label: 'Gap',    val: `−${Math.max(0, sim.integrityTarget - INTEGRITY).toFixed(1)}%`, color: '#C44B6E' },
+                  { label: 'Rate',   val: `${sim.decayRate}%/h`, color: '#D4923A' },
                 ].map(({ label, val, color }) => (
                   <div key={label} className="flex items-center justify-between">
-                    <span className="tele text-[9px] text-white/30">{label}</span>
-                    <span className={`tele text-[10px] font-medium ${color}`}>{val}</span>
+                    <span className="tele text-[9px]" style={{ color: 'rgba(212,146,58,0.32)' }}>{label}</span>
+                    <span className="tele text-[10px] font-medium" style={{ color }}>{val}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Progress bar */}
-            <div className="mt-3">
-              <div className="progress-bar">
-                <div className="absolute inset-y-0 left-0 rounded-full"
-                  style={{ width: `${INTEGRITY}%`, background: 'linear-gradient(90deg,#E8506A,#E8B96A)', transition: 'width 1.5s ease', boxShadow: '0 0 8px rgba(232,80,106,0.4)' }}
-                />
-              </div>
-              <p className="tele text-[9px] text-decay/60 mt-1.5">⚠ Restore before city vanishes</p>
+            <div className="mt-4">
+              <EmberBar value={INTEGRITY} height={5} />
+              <p className="tele text-[8px] mt-2" style={{ color: 'rgba(196,75,110,0.55)' }}>
+                ⚠ Restore before the city vanishes
+              </p>
             </div>
           </div>
 
           {/* Alerts */}
-          <div className="loom-card p-4 flex-1 min-h-0 flex flex-col">
-            <div className="flex items-center justify-between mb-3">
+          <div className="loom-card p-4 flex flex-col" style={{ maxHeight: '280px' }}>
+            <div className="flex items-center justify-between mb-2 shrink-0">
               <div className="flex items-center gap-2">
-                <AlertTriangle size={12} className="text-decay" />
-                <span className="display text-xs font-medium text-white/60 uppercase tracking-wide">Alerts</span>
+                <AlertTriangle size={11} style={{ color: '#C44B6E' }} />
+                <span className="display text-xs font-normal uppercase tracking-wide" style={{ color: 'rgba(255,220,160,0.55)', letterSpacing: '0.1em' }}>
+                  Alerts
+                </span>
               </div>
-              <span className="badge-decay tele text-[9px] px-1.5 py-0.5 rounded-full">
+              <span
+                className="tele text-[8px] px-1.5 py-0.5 rounded-full"
+                style={{ background: 'rgba(196,75,110,0.12)', color: '#C44B6E', border: '1px solid rgba(196,75,110,0.22)' }}
+              >
                 {ALERTS.filter(a => a.type === 'critical').length} critical
               </span>
             </div>
             <div className="flex-1 overflow-y-auto">
-              {ALERTS.map((a, i) => <AlertItem key={i} {...a} />)}
+              {ALERTS.map((a, i) => <AlertItem key={i} {...a} index={i} />)}
             </div>
           </div>
 
-          {/* Emotion readout */}
+          {/* Emotion Index */}
           <div className="loom-card p-4">
             <div className="flex items-center gap-2 mb-3">
-              <Heart size={12} className="text-paradox" />
-              <span className="display text-xs font-medium text-white/60 uppercase tracking-wide">Emotion Index</span>
+              <Heart size={11} style={{ color: '#7B5EA8' }} />
+              <span className="display text-xs font-normal uppercase tracking-wide" style={{ color: 'rgba(255,220,160,0.55)', letterSpacing: '0.1em' }}>
+                Emotion Index
+              </span>
             </div>
-            <div>
-              {EMOTIONS.map((e) => <EmotionBar key={e.label} {...e} />)}
-            </div>
-            <p className="tele text-[9px] text-white/20 mt-3">
-              Derived from archived memory fragments — Sector 1–6
+            {EMOTIONS.map(e => <EmotionBar key={e.label} {...e} />)}
+            <p className="tele text-[8px] mt-2" style={{ color: 'rgba(212,146,58,0.22)' }}>
+              {mission.emotionIndex.description.slice(0, 60)}…
             </p>
           </div>
         </div>
 
-        {/* ── CENTRE (3D Loom Canvas) ── */}
+        {/* ─── CENTRE — Living Loom Canvas ─── */}
         <div className="xl:col-span-6 loom-card flex flex-col overflow-hidden">
-          <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
+          {/* Canvas header */}
+          <div
+            className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0"
+            style={{ borderBottom: '1px solid rgba(212,146,58,0.06)' }}
+          >
             <div className="flex items-center gap-2">
-              <Activity size={13} className="text-thread" />
-              <span className="display text-xs font-medium text-white/60 uppercase tracking-wide">Loom Canvas</span>
+              <Activity size={12} style={{ color: '#D4923A' }} />
+              <span className="display text-xs font-normal uppercase tracking-wide" style={{ color: 'rgba(255,220,160,0.55)', letterSpacing: '0.1em' }}>
+                Loom Canvas
+              </span>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-thread animate-pulse" />
-                <span className="tele text-[9px] text-thread/60">Live</span>
+                <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#D4923A' }} />
+                <span className="tele text-[9px]" style={{ color: 'rgba(212,146,58,0.5)' }}>Live</span>
               </div>
-              <span className="tele text-[9px] text-white/20">Step 6: Three.js</span>
+              <span className="tele text-[8px]" style={{ color: 'rgba(212,146,58,0.2)' }}>
+                Thread Integrity Visualization
+              </span>
             </div>
           </div>
-          <div className="flex-1 min-h-0">
-            <LoomCanvasPlaceholder />
+
+          {/* The living canvas */}
+          <div className="flex-1 min-h-0 loom-canvas-area" style={{ minHeight: '320px' }}>
+            <LoomCanvas />
           </div>
 
-          {/* Canvas bottom stats */}
-          <div className="grid grid-cols-3 gap-0 border-t border-white/5 shrink-0">
+          {/* Canvas stats footer */}
+          <div
+            className="grid grid-cols-3 border-t shrink-0"
+            style={{ borderTopColor: 'rgba(212,146,58,0.06)' }}
+          >
             {[
-              { label: 'Active Threads',   value: dashStats.timelinesActive.toLocaleString(), color: '#4C8CFF' },
-              { label: 'Fragment Nodes',   value: dashStats.fragmentsTotal.toLocaleString(), color: '#E8B96A' },
-              { label: 'Paradox Anchors',  value: dashStats.paradoxesActive.toLocaleString(), color: '#9D6FE0' },
+              { label: 'Active Threads',  value: dashStats.timelinesActive.toLocaleString(), color: '#D4923A' },
+              { label: 'Fragment Nodes',  value: dashStats.fragmentsTotal.toLocaleString(),  color: '#B8A060' },
+              { label: 'Paradox Anchors', value: dashStats.paradoxesActive.toLocaleString(), color: '#7B5EA8' },
             ].map(({ label, value, color }) => (
-              <div key={label} className="flex flex-col items-center py-3 border-r border-white/5 last:border-0">
-                <span className="tele text-sm font-medium" style={{ color }}>{value}</span>
-                <span className="tele text-[9px] text-white/25 mt-0.5">{label}</span>
+              <div
+                key={label}
+                className="flex flex-col items-center py-3 border-r last:border-0"
+                style={{ borderRightColor: 'rgba(212,146,58,0.05)' }}
+              >
+                <span className="display text-sm font-normal" style={{ color, textShadow: `0 0 8px ${color}40` }}>{value}</span>
+                <span className="tele text-[8px] mt-0.5" style={{ color: 'rgba(212,146,58,0.25)' }}>{label}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* ── RIGHT COLUMN (Timeline feed) ── */}
+        {/* ─── RIGHT — Event feed + Mission ─── */}
         <div className="xl:col-span-3 loom-card p-4 flex flex-col">
+          {/* Live event feed */}
           <div className="flex items-center justify-between mb-3 shrink-0">
             <div className="flex items-center gap-2">
-              <MessageSquare size={12} className="text-stability" />
-              <span className="display text-xs font-medium text-white/60 uppercase tracking-wide">Timeline</span>
+              <MessageSquare size={11} style={{ color: '#4A8FA8' }} />
+              <span className="display text-xs font-normal uppercase tracking-wide" style={{ color: 'rgba(255,220,160,0.55)', letterSpacing: '0.1em' }}>
+                Event Feed
+              </span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-decay animate-pulse" />
-              <span className="tele text-[9px] text-decay">Live</span>
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#C44B6E' }} />
+              <span className="tele text-[9px]" style={{ color: '#C44B6E' }}>Live</span>
             </div>
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            {TIMELINE_EVENTS.map((ev, i) => <TimelineRow key={i} {...ev} />)}
+            {TIMELINE_EVENTS.map((ev, i) => <TimelineRow key={i} {...ev} index={i} />)}
           </div>
 
           {/* Mission progress */}
-          <div className="mt-3 pt-3 border-t border-white/5 shrink-0">
+          <div
+            className="mt-3 pt-3 shrink-0"
+            style={{ borderTop: '1px solid rgba(212,146,58,0.07)' }}
+          >
             <div className="flex items-center justify-between mb-2">
-              <span className="tele text-[9px] text-white/30 uppercase tracking-widest">Mission Progress</span>
-              <span className="tele text-[9px] text-thread">{completedObjectives} / {totalObjectives}</span>
+              <span className="tele text-[9px] uppercase tracking-widest" style={{ color: 'rgba(212,146,58,0.32)' }}>
+                Mission Progress
+              </span>
+              <span className="tele text-[9px] font-medium" style={{ color: '#D4923A' }}>
+                {completedObjectives} / {totalObjectives}
+              </span>
             </div>
-            <div className="space-y-1.5">
+
+            {/* Mission progress bar */}
+            <EmberBar value={Math.round((completedObjectives / totalObjectives) * 100)} height={3} />
+
+            {/* Objectives */}
+            <div className="space-y-2 mt-3">
               {mission.objectives.slice(0, 4).map(({ task, done }) => (
-                <div key={task} className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded border flex items-center justify-center shrink-0 ${done ? 'bg-stability/20 border-stability/40' : 'bg-white/4 border-white/12'}`}>
-                    {done && <span className="text-stability text-[7px]">✓</span>}
+                <div key={task} className="flex items-start gap-2">
+                  <div
+                    className="w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0 mt-0.5"
+                    style={{
+                      background: done ? 'rgba(74,143,168,0.15)' : 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${done ? 'rgba(74,143,168,0.4)' : 'rgba(212,146,58,0.12)'}`,
+                    }}
+                  >
+                    {done && <span style={{ color: '#4A8FA8', fontSize: '7px' }}>✓</span>}
                   </div>
-                  <span className={`text-xs ${done ? 'text-white/25 line-through' : 'text-white/55'}`}>{task}</span>
+                  <span
+                    className="ui-text text-xs leading-snug"
+                    style={{ color: done ? 'rgba(255,220,160,0.22)' : 'rgba(255,220,160,0.6)', textDecoration: done ? 'line-through' : 'none' }}
+                  >
+                    {task}
+                  </span>
                 </div>
               ))}
             </div>
-            <button className="mt-3 w-full py-2 rounded-lg bg-thread/8 border border-thread/15 tele text-[10px] text-thread hover:bg-thread/15 transition-colors flex items-center justify-center gap-1.5">
-              View Full Mission Brief <ChevronRight size={10} />
+
+            {/* View mission button */}
+            <button
+              className="mt-3 w-full py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 group"
+              style={{
+                background: 'rgba(212,146,58,0.06)',
+                border: '1px solid rgba(212,146,58,0.14)',
+                color: 'rgba(212,146,58,0.7)',
+              }}
+            >
+              <span className="display text-xs font-normal" style={{ letterSpacing: '0.04em' }}>
+                View Full Mission Brief
+              </span>
+              <ChevronRight size={10} style={{ color: '#D4923A' }} />
             </button>
+
+            {/* Codex quote */}
+            <p
+              className="display text-[10px] italic text-center mt-3 leading-relaxed"
+              style={{ color: 'rgba(212,146,58,0.22)', fontStyle: 'italic' }}
+            >
+              "{mission.codex[0]}"
+            </p>
           </div>
         </div>
 

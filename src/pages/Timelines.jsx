@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { GitBranch, Clock, Zap, ChevronRight, Search, Filter } from 'lucide-react'
 import { timelines, timelinesMeta } from '../data'
+import EmberBar from '../components/ui/EmberBar'
 
 const STATUS = {
   stable:    { label: 'Stable',    class: 'badge-stability' },
@@ -97,8 +98,8 @@ export default function Timelines() {
                   <span className="tele text-[11px] text-white/50">{tl.branches}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 h-1 bg-white/5 rounded-full">
-                    <div className="h-full rounded-full" style={{ width: `${tl.integrity}%`, background: tl.integrity < 40 ? '#E8506A' : tl.integrity < 70 ? '#E8B96A' : '#4C8CFF' }} />
+                  <div className="flex-1">
+                    <EmberBar value={tl.integrity} height={3} />
                   </div>
                   <span className={`tele text-[10px] ${intColor} w-8 text-right`}>{tl.integrity}%</span>
                 </div>
