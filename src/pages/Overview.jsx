@@ -12,6 +12,7 @@ import {
   MessageSquare,
   ChevronRight,
 } from 'lucide-react'
+import { dashStats, events, mission } from '../data'
 
 /* ── Animated counter ──────────────────────────────── */
 function AnimatedCounter({ to, suffix = '', decimals = 1, duration = 1800 }) {
@@ -200,46 +201,49 @@ function TimelineRow({ time, event, type, sector }) {
 }
 
 /* ═══════════════════════════════════════════════════ */
-/*  DATA                                              */
+/*  DATA INTEGRATION (DYNAMIC)                        */
 /* ═══════════════════════════════════════════════════ */
-const INTEGRITY = 42.5
+const INTEGRITY = dashStats.integrityNow
 
-const ALERTS = [
-  { type: 'critical', message: 'Memory cluster Δ-7 breach — Sector 9 approaching collapse', time: '14:22:07' },
-  { type: 'critical', message: 'PAR-001 causal loop expanding — fragment drain 2,100/hr', time: '14:05:11' },
-  { type: 'warn',     message: 'Cascade risk in memory strands 441–460, Sector 6', time: '13:41:20' },
-  { type: 'info',     message: 'Thread TL-182 partially restored after paradox seal', time: '14:18:33' },
-]
+const ALERTS = events
+  .filter(e => e.severity === 'critical' || e.severity === 'high' || e.severity === 'warn')
+  .map(e => ({
+    type: e.severity === 'critical' ? 'critical' : e.severity === 'warn' ? 'warn' : 'info',
+    message: e.event,
+    time: e.time
+  }))
 
 const EMOTIONS = [
-  { label: 'Despair',  value: 72, color: '#E8506A' },
-  { label: 'Hope',     value: 28, color: '#4C8CFF' },
-  { label: 'Clarity',  value: 18, color: '#9D6FE0' },
-  { label: 'Fear',     value: 65, color: '#E8B96A' },
-  { label: 'Resolve',  value: 43, color: '#4C8CFF' },
+  { label: 'Despair',  value: mission.emotionIndex.despair, color: '#E8506A' },
+  { label: 'Hope',     value: mission.emotionIndex.hope, color: '#4C8CFF' },
+  { label: 'Clarity',  value: mission.emotionIndex.clarity, color: '#9D6FE0' },
+  { label: 'Fear',     value: mission.emotionIndex.fear, color: '#E8B96A' },
+  { label: 'Resolve',  value: mission.emotionIndex.resolve, color: '#4C8CFF' },
 ]
 
-const TIMELINE_EVENTS = [
-  { time: '14:22:07', event: 'Memory cluster Δ-7 breach detected in Sector 9', type: 'breach', sector: 'SEC-9' },
-  { time: '14:18:33', event: 'Timeline TL-182 partially restored after paradox seal', type: 'restored', sector: 'SEC-4' },
-  { time: '14:05:11', event: 'Anomaly PAR-003 expanding — immediate attention', type: 'anomaly', sector: 'CORE' },
-  { time: '13:57:44', event: 'Fragment batch #2241 archived successfully', type: 'restored', sector: 'SEC-2' },
-  { time: '13:41:20', event: 'Cascade risk in memory strands 441–460', type: 'warn', sector: 'SEC-6' },
-]
+const TIMELINE_EVENTS = events.slice(0, 5).map(e => ({
+  time: e.time,
+  event: e.event,
+  type: e.type,
+  sector: e.sector
+}))
 
 /* ═══════════════════════════════════════════════════ */
 /*  OVERVIEW PAGE                                     */
 /* ═══════════════════════════════════════════════════ */
 export default function Overview() {
+  const completedObjectives = mission.objectives.filter(o => o.done).length
+  const totalObjectives = mission.objectives.length
+
   return (
     <div className="p-4 h-full">
       {/* ── Top quick-stats bar ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
         {[
-          { icon: Brain,    label: 'Fragments',  value: '18,342', sub: '↓ 412 since sync',       color: 'text-decay' },
-          { icon: GitBranch,label: 'Timelines',  value: '247',    sub: '12 divergent',             color: 'text-stability' },
-          { icon: Zap,      label: 'Paradoxes',  value: '3',      sub: '1 critical',               color: 'text-paradox' },
-          { icon: Clock,    label: 'Time Left',  value: '47h 23m', sub: 'Until city erasure',      color: 'text-decay' },
+          { icon: Brain,    label: 'Fragments',  value: dashStats.fragmentsTotal.toLocaleString(), sub: `↓ ${dashStats.fragmentsLost} since sync`, color: 'text-decay' },
+          { icon: GitBranch,label: 'Timelines',  value: dashStats.timelinesActive.toLocaleString(), sub: `${dashStats.timelinesDivergent} divergent`, color: 'text-stability' },
+          { icon: Zap,      label: 'Paradoxes',  value: dashStats.paradoxesActive.toLocaleString(), sub: `${dashStats.paradoxesCritical} critical`, color: 'text-paradox' },
+          { icon: Clock,    label: 'Time Left',  value: `${dashStats.hoursRemaining}h ${dashStats.minutesRemaining}m`, sub: 'Until city erasure', color: 'text-decay' },
         ].map(({ icon: Icon, label, value, sub, color }) => (
           <div key={label} className="loom-card px-3 py-2.5 flex items-center gap-3">
             <Icon size={14} className={color} />
@@ -271,9 +275,9 @@ export default function Overview() {
               <IntegrityRing value={INTEGRITY} />
               <div className="flex flex-col gap-2 flex-1">
                 {[
-                  { label: 'Target', val: '85%',    color: 'text-stability' },
-                  { label: 'Gap',    val: '−42.5%', color: 'text-decay' },
-                  { label: 'Rate',   val: '−0.3%/h', color: 'text-thread' },
+                  { label: 'Target', val: `${dashStats.integrityTarget}%`, color: 'text-stability' },
+                  { label: 'Gap',    val: `−${(dashStats.integrityTarget - INTEGRITY).toFixed(1)}%`, color: 'text-decay' },
+                  { label: 'Rate',   val: `${dashStats.integrityDecay > 0 ? '+' : ''}${dashStats.integrityDecay}%/h`, color: 'text-thread' },
                 ].map(({ label, val, color }) => (
                   <div key={label} className="flex items-center justify-between">
                     <span className="tele text-[9px] text-white/30">{label}</span>
@@ -347,9 +351,9 @@ export default function Overview() {
           {/* Canvas bottom stats */}
           <div className="grid grid-cols-3 gap-0 border-t border-white/5 shrink-0">
             {[
-              { label: 'Active Threads',   value: '247',    color: '#4C8CFF' },
-              { label: 'Fragment Nodes',   value: '18,342', color: '#E8B96A' },
-              { label: 'Paradox Anchors',  value: '3',      color: '#9D6FE0' },
+              { label: 'Active Threads',   value: dashStats.timelinesActive.toLocaleString(), color: '#4C8CFF' },
+              { label: 'Fragment Nodes',   value: dashStats.fragmentsTotal.toLocaleString(), color: '#E8B96A' },
+              { label: 'Paradox Anchors',  value: dashStats.paradoxesActive.toLocaleString(), color: '#9D6FE0' },
             ].map(({ label, value, color }) => (
               <div key={label} className="flex flex-col items-center py-3 border-r border-white/5 last:border-0">
                 <span className="tele text-sm font-medium" style={{ color }}>{value}</span>
@@ -380,15 +384,10 @@ export default function Overview() {
           <div className="mt-3 pt-3 border-t border-white/5 shrink-0">
             <div className="flex items-center justify-between mb-2">
               <span className="tele text-[9px] text-white/30 uppercase tracking-widest">Mission Progress</span>
-              <span className="tele text-[9px] text-thread">1 / 4</span>
+              <span className="tele text-[9px] text-thread">{completedObjectives} / {totalObjectives}</span>
             </div>
             <div className="space-y-1.5">
-              {[
-                { task: 'Archive Fragment batch #2241', done: true },
-                { task: 'Seal PAR-001 causal loop',    done: false },
-                { task: 'Restore Sector 3 fragments',  done: false },
-                { task: 'Stabilize Core timeline',     done: false },
-              ].map(({ task, done }) => (
+              {mission.objectives.slice(0, 4).map(({ task, done }) => (
                 <div key={task} className="flex items-center gap-2">
                   <div className={`w-3 h-3 rounded border flex items-center justify-center shrink-0 ${done ? 'bg-stability/20 border-stability/40' : 'bg-white/4 border-white/12'}`}>
                     {done && <span className="text-stability text-[7px]">✓</span>}

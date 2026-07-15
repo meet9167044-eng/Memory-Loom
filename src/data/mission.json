@@ -1,0 +1,98 @@
+{
+  "mission": {
+    "id": "MISSION-OMEGA-7",
+    "title": "Operation: Remember the Last City",
+    "briefing": "The Last Forgotten City of Ω-7 is erasing from the historical record at an accelerating rate. As Senior Reality Archivist (Class Ω), your mandate is to restore Memory Integrity from its current critical level of 42.5% to the minimum stability threshold of 85% before the city vanishes permanently from all timeline branches.",
+    "integrityTarget": 85,
+    "integrityNow": 42.5,
+    "integrityDecayRate": -0.3,
+    "status": "active",
+    "priority": "OMEGA",
+    "classification": "ARCHIVIST-EYES-ONLY",
+    "deadline": {
+      "hoursRemaining": 47,
+      "minutesRemaining": 23,
+      "isoDeadline": "2026-07-17T08:47:00Z"
+    },
+    "archivist": {
+      "name": "Sr. Archivist — You",
+      "designation": "Senior Reality Archivist",
+      "classLevel": "Ω",
+      "clearance": "ΩΩΩ",
+      "sector": "All Sectors",
+      "yearsActive": 14
+    },
+    "systemStatus": {
+      "archivist": "ONLINE",
+      "threadSync": "ACTIVE",
+      "paradoxLog": "3 NEW",
+      "voidCore": "UNSTABLE",
+      "loomCanvas": "DEGRADED"
+    },
+    "emotionIndex": {
+      "despair": 72,
+      "hope": 28,
+      "clarity": 18,
+      "fear": 65,
+      "resolve": 43,
+      "description": "Collective emotional state derived from active memory fragments across Sectors 1-6. High despair and fear are accelerating fragmentation."
+    },
+    "objectives": [
+      {
+        "id": "OBJ-1",
+        "task": "Archive Fragment batch #2241",
+        "detail": "Secure MF-2241 (The Last Coronation of Verdana) into the primary archive with ≥ 90% integrity.",
+        "done": true,
+        "points": 100,
+        "completedAt": "2026-07-15T06:40:00Z"
+      },
+      {
+        "id": "OBJ-2",
+        "task": "Seal PAR-001 causal loop",
+        "detail": "Resolve the Verdana Dual-State Paradox to stop the 2,100 fragment/hr drain from Sector 1.",
+        "done": false,
+        "points": 300,
+        "completedAt": null
+      },
+      {
+        "id": "OBJ-3",
+        "task": "Restore Sector 3 fragments",
+        "detail": "Bring Sector 3 integrity from 34% to ≥ 60% by recovering and reanchoring corrupted fragments.",
+        "done": false,
+        "points": 200,
+        "completedAt": null
+      },
+      {
+        "id": "OBJ-4",
+        "task": "Stabilise Core timeline",
+        "detail": "Silence the Void Core echo cascade (PAR-003) and prevent TL-012 collapse.",
+        "done": false,
+        "points": 400,
+        "completedAt": null
+      },
+      {
+        "id": "OBJ-5",
+        "task": "Decode the future signal",
+        "detail": "Extract coordinates from MF-2229 and MF-2222 to understand the future transmission.",
+        "done": false,
+        "points": 150,
+        "completedAt": null
+      },
+      {
+        "id": "OBJ-6",
+        "task": "Resolve PAR-002 identity collapse",
+        "detail": "Reconcile the Mira Chen duplicate identity paradox before quantum collapse in Sec-3.",
+        "done": false,
+        "points": 250,
+        "completedAt": null
+      }
+    ],
+    "codex": [
+      "Reality exists only because someone remembers it.",
+      "A forgotten name is not merely absent — it unmakes.",
+      "The Archivist who remembers saves more than the warrior who fights.",
+      "When integrity falls below 50%, even the remembering becomes unstable.",
+      "The Loom does not weave futures — it preserves the threads of what was."
+    ]
+  }
+}
